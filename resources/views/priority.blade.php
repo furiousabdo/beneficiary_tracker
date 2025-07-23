@@ -1,8 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Beneficiary Priority List')
 @section('content')
-    <h1>Beneficiary Priority List</h1>
-    <table border="1" cellpadding="10" style="width:100%; margin-top:2rem;">
+<div class="card">
+    <h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1.5rem;">Beneficiary Priority List</h1>
+    <table>
         <thead>
             <tr>
                 <th>Family Name</th>
@@ -16,11 +17,11 @@
                     <td>{{ $family->family_name ?? 'N/A' }}</td>
                     <td>${{ number_format($family->totalAid(), 2) }}</td>
                     <td>
-                        <ul>
+                        <ul style="margin:0;padding-left:1.2rem;">
                         @foreach($family->beneficiaries as $beneficiary)
-                            <li>
+                            <li style="margin-bottom:0.5rem;">
                                 <strong>{{ $beneficiary->name }}</strong>
-                                <ul>
+                                <ul style="margin:0.2rem 0 0 1.2rem;">
                                     @foreach($beneficiary->aidRecords as $aid)
                                         <li>{{ $aid->aid_type }}: ${{ number_format($aid->amount, 2) }} ({{ $aid->date_given }})</li>
                                     @endforeach
@@ -33,4 +34,5 @@
             @endforeach
         </tbody>
     </table>
+</div>
 @endsection 

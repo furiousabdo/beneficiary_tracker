@@ -13,15 +13,11 @@ return new class extends Migration
 
             // Association relationship
             $table->foreignId('association_id')
-                  ->constrained('associations')
-                  ->onDelete('cascade')
                   ->comment('الجمعية');
 
             // Family head (father) reference
             $table->foreignId('father_id')
                   ->nullable()
-                  ->constrained('persons')
-                  ->onDelete('set null')
                   ->comment('رب الأسرة');
 
             // Family details

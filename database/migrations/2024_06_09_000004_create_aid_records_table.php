@@ -8,8 +8,8 @@ return new class extends Migration {
     {
         Schema::create('aid_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('beneficiary_id')->constrained('beneficiaries')->onDelete('cascade');
-            $table->foreignId('association_id')->constrained('associations')->onDelete('cascade');
+            $table->foreignId('beneficiary_id');
+            $table->foreignId('association_id');
             $table->string('aid_type');
             $table->decimal('amount', 10, 2)->default(0);
             $table->date('date_given');

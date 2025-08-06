@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->string('name');
             $table->date('date_of_birth')->nullable();
             $table->string('contact_info')->nullable();
-            $table->foreignId('family_id')->constrained('families')->onDelete('cascade');
+            $table->foreignId('family_id');
             $table->timestamps();
         });
     }

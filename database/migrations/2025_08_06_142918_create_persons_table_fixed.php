@@ -21,14 +21,42 @@ return new class extends Migration
             $table->text('address')->nullable()->comment('العنوان');
             
             // Family relationship
-            $table->foreignId('family_id')->constrained('families')->onDelete('cascade')->comment('العائلة');
+            $table->foreignId('family_id')->nullable()->comment('العائلة');
             
             // Parent relationships
-            $table->foreignId('father_id')->nullable()->constrained('persons')->onDelete('set null')->comment('الأب');
-            $table->foreignId('mother_id')->nullable()->constrained('persons')->onDelete('set null')->comment('الأم');
+            $table->foreignId('father_id')->nullable()->comment('الأب');
+            $table->foreignId('mother_id')->nullable()->comment('الأم');
+            
+            // Spouse relationship
+            $table->foreignId('spouse_id')->nullable()->comment('الزوج/الزوجة');
             
             // Track if this person is the family head (father)
             $table->boolean('is_family_head')->default(false)->comment('رب الأسرة');
+            
+            // Relationship to family head
+            $table->enum('relationship_to_family_head', [
+                'رب الأسرة', // Family Head
+                'زوجة', // Wife
+                'ابن', // Son
+                'ابنة', // Daughter
+                'أب', // Father
+                'أم', // Mother
+                'أخ', // Brother
+                'أخت', // Sister
+                'جد', // Grandfather
+                'جدة', // Grandmother
+                'عم', // Uncle (Father's Brother)
+                'عمة', // Aunt (Father's Sister)
+                'خال', // Uncle (Mother's Brother)
+                'خالة', // Aunt (Mother's Sister)
+                'ابن الأخ', // Nephew (Brother's Son)
+                'ابنة الأخ', // Niece (Brother's Daughter)
+                'ابن الأخت', // Nephew (Sister's Son)
+                'ابنة الأخت', // Niece (Sister's Daughter)
+                'حفيد', // Grandson
+                'حفيدة', // Granddaughter
+                'أخرى' // Other
+            ])->nullable()->comment('العلاقة برب الأسرة');
             
             $table->timestamps();
             $table->softDeletes();

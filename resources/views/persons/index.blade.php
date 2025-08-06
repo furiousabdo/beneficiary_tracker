@@ -1,140 +1,140 @@
 @extends('layouts.app')
 
-@section('title', 'الأشخاص')
-@section('header', 'قائمة الأشخاص')
-
-@section('actions')
-    <div class="btn-group" role="group">
-        <a href="{{ route('persons.index') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-list"></i> عرض الكل
-        </a>
-        <a href="{{ route('families.index') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> إضافة شخص جديد
-        </a>
-    </div>
-@endsection
-
+@section('title', 'الأفراد')
 @section('content')
 <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+            <i class="fas fa-users me-2"></i>الأفراد
+        </h3>
+        <div class="d-flex gap-2">
+            <a href="{{ route('families.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-home me-1"></i>العائلات
+            </a>
+            <a href="{{ route('persons.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>إضافة فرد جديد
+            </a>
+        </div>
+    </div>
     <div class="card-body">
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>الاسم</th>
-                        <th>رقم الهوية</th>
-                        <th>العائلة</th>
-                        <th>الجمعية</th>
-                        <th>الجنس</th>
-                        <th>تاريخ الميلاد</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($persons as $person)
+        @if($persons->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $person->name_ar }}</td>
-                            <td>{{ $person->national_id ?? '--' }}</td>
-                            <td>{{ $person->family->father->name_ar ?? 'غير محدد' }}</td>
-                            <td>{{ $person->family->association->name_ar ?? 'غير محدد' }}</td>
-                            <td>
-                                @if($person->gender == 'male')
-                                    <span class="badge bg-primary">ذكر</span>
-                                @else
-                                    <span class="badge bg-pink">أنثى</span>
-                                @endif
-                            </td>
-                            <td>{{ $person->birth_date->format('Y-m-d') }}</td>
-                            <td>
-                                <a href="{{ route('persons.show', ['family' => $person->family_id, 'person' => $person->id]) }}" 
-                                   class="btn btn-sm btn-info" title="عرض">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('persons.edit', ['family' => $person->family_id, 'person' => $person->id]) }}" 
-                                   class="btn btn-sm btn-warning" title="تعديل">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('persons.destroy', ['family' => $person->family_id, 'person' => $person->id]) }}" 
-                                      method="POST" class="d-inline" 
-                                      onsubmit="return confirm('هل أنت متأكد من حذف هذا الشخص؟')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="حذف">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
+                            <th>#</th>
+                            <th>الاسم</th>
+                            <th>رقم الهوية</th>
+                            <th>اسم العائلة</th>
+                            <th>الجمعية</th>
+                            <th>الجنس</th>
+                            <th>العلاقة برب الأسرة</th>
+                            <th>تاريخ الميلاد</th>
+                            <th>الإجراءات</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    لا توجد سجلات للأشخاص
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        @if($persons->hasPages())
-            <div class="mt-4">
-                {{ $persons->links() }}
+                    </thead>
+                    <tbody>
+                        @foreach($persons as $person)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>
+                                    <strong>{{ $person->name_ar ?? 'غير محدد' }}</strong>
+                                </td>
+                                <td>
+                                    @if($person->national_id)
+                                        {{ $person->national_id }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($person->family)
+                                        <strong>{{ $person->family->name_ar ?? 'غير محدد' }}</strong>
+                                        @if($person->family->father)
+                                            <br><small class="text-muted">رب الأسرة: {{ $person->family->father->name_ar }}</small>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($person->family && $person->family->association)
+                                        {{ $person->family->association->name_ar ?? $person->family->association->name_en ?? 'غير محدد' }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($person->gender == 'ذكر')
+                                        <span class="badge bg-primary">ذكر</span>
+                                    @elseif($person->gender == 'أنثى')
+                                        <span class="badge bg-pink">أنثى</span>
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($person->is_family_head)
+                                        <span class="badge bg-warning">رب الأسرة</span>
+                                    @elseif($person->relationship_to_family_head)
+                                        <span class="badge bg-info">{{ $person->relationship_to_family_head }}</span>
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($person->birth_date)
+                                        {{ \Carbon\Carbon::parse($person->birth_date)->format('Y/m/d') }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('persons.show', ['family' => $person->family_id, 'person' => $person->id]) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="عرض">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('persons.edit', ['family' => $person->family_id, 'person' => $person->id]) }}" 
+                                           class="btn btn-sm btn-outline-secondary" 
+                                           title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('persons.destroy', ['family' => $person->family_id, 'person' => $person->id]) }}" 
+                                              method="POST" 
+                                              style="display:inline;"
+                                              onsubmit="return confirm('هل أنت متأكد من حذف هذا الفرد؟')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger" 
+                                                    title="حذف">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد أفراد مسجلين</h5>
+                <p class="text-muted">ابدأ بإضافة عائلة جديدة أو فرد جديد</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{{ route('families.create') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-1"></i>إضافة عائلة جديدة
+                    </a>
+                    <a href="{{ route('persons.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>إضافة فرد جديد
+                    </a>
+                </div>
             </div>
         @endif
     </div>
 </div>
-
-<!-- Add Person Modal -->
-<div class="modal fade" id="addPersonModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">إضافة شخص جديد</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>الرجاء اختيار العائلة أولاً:</p>
-                <select class="form-select mb-3" id="familySelect">
-                    <option value="">-- اختر العائلة --</option>
-                    @foreach($families as $family)
-                        <option value="{{ route('families.persons.create', $family) }}">
-                            {{ $family->father->name_ar ?? 'عائلة ' . $family->id }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                <a href="#" id="proceedToAddPerson" class="btn btn-primary">متابعة</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const familySelect = document.getElementById('familySelect');
-        const proceedBtn = document.getElementById('proceedToAddPerson');
-        
-        familySelect.addEventListener('change', function() {
-            proceedBtn.href = this.value;
-            proceedBtn.disabled = !this.value;
-        });
-        
-        // Initialize button state
-        proceedBtn.disabled = true;
-    });
-</script>
-@endpush
-
 @endsection

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'نظام متابعة المستفيدين')</title>
+    <title>@yield('title', 'اسكان متابعة')</title>
     <!-- RTL Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
     <!-- Font Awesome -->
@@ -50,7 +50,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ route('home') }}">نظام المتابعة</a>
+                <a class="navbar-brand" href="{{ route('home') }}">اسكان متابعة</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -74,6 +74,16 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('persons.*') ? 'active' : '' }}" href="{{ route('persons.index') }}">
                                 <i class="fas fa-user-friends me-1"></i> الأفراد
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('beneficiaries.*') ? 'active' : '' }}" href="{{ route('beneficiaries.index') }}">
+                                <i class="fas fa-heart me-1"></i> المستفيدين
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('aid-records.*') ? 'active' : '' }}" href="{{ route('aid-records.index') }}">
+                                <i class="fas fa-hand-holding-heart me-1"></i> سجلات المساعدة
                             </a>
                         </li>
                     </ul>
@@ -126,7 +136,7 @@
         @yield('content')
 
         <footer class="mt-5 text-center text-muted">
-            <p>© {{ date('Y') }} نظام متابعة المستفيدين. جميع الحقوق محفوظة</p>
+            <p>© {{ date('Y') }} اسكان متابعة. جميع الحقوق محفوظة</p>
         </footer>
     </div>
 

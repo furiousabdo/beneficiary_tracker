@@ -56,6 +56,9 @@ class FamilyController extends Controller
 
             $family->update(['father_id' => $father->id]);
 
+            // Update the father's relationship to family head
+            $father->updateRelationshipToFamilyHead();
+
             \DB::commit();
             return redirect()->route('families.show', $family)
                 ->with('success', 'تم إضافة العائلة بنجاح');
@@ -67,7 +70,7 @@ class FamilyController extends Controller
 
     public function show(Family $family)
     {
-        $family->load(['father', 'mother', 'persons']);
+        $family->load(['father', 'persons']);
         return view('families.show', compact('family'));
     }
 
@@ -118,7 +121,7 @@ class FamilyController extends Controller
 
     public function tree(Family $family)
     {
-        $family->load(['father.children', 'mother']);
+        $family->load(['father.children']);
         return view('families.tree', compact('family'));
     }
 }

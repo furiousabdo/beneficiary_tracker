@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'الرئيسية')
+@section('title', 'اسكان متابعة - الرئيسية')
 @section('header', 'لوحة التحكم')
 
 @section('content')
@@ -28,7 +28,7 @@
 
 <!-- Stats Cards -->
 <div class="row mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-white bg-primary mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -45,7 +45,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-white bg-success mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -62,7 +62,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-white bg-info mb-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -75,6 +75,40 @@
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
                 <a class="small text-white stretched-link" href="{{ route('persons.index') }}">عرض التفاصيل</a>
+                <div class="small text-white"><i class="fas fa-angle-left"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">المستفيدين</h5>
+                        <h2 class="mb-0">{{ $beneficiariesCount }}</h2>
+                    </div>
+                    <i class="fas fa-heart fa-3x"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{{ route('beneficiaries.index') }}">عرض التفاصيل</a>
+                <div class="small text-white"><i class="fas fa-angle-left"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">سجلات المساعدة</h5>
+                        <h2 class="mb-0">{{ $aidRecordsCount }}</h2>
+                    </div>
+                    <i class="fas fa-hand-holding-heart fa-3x"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{{ route('aid-records.index') }}">عرض التفاصيل</a>
                 <div class="small text-white"><i class="fas fa-angle-left"></i></div>
             </div>
         </div>
@@ -180,6 +214,76 @@
             </div>
         @else
             <div class="alert alert-info">لا توجد سجلات أفراد مسجلة بعد.</div>
+        @endif
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">أحدث المستفيدين المسجلين</h5>
+        <a href="{{ route('beneficiaries.create') }}" class="btn btn-warning btn-sm">
+            <i class="fas fa-plus"></i> إضافة مستفيد جديد
+        </a>
+    </div>
+    <div class="card-body">
+        @if(isset($recentBeneficiaries) && $recentBeneficiaries->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>تاريخ الميلاد</th>
+                            <th>العائلة</th>
+                            <th>معلومات الاتصال</th>
+                            <th>عدد المساعدات</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($recentBeneficiaries as $beneficiary)
+                            <tr>
+                                <td><strong>{{ $beneficiary->name }}</strong></td>
+                                <td>
+                                    @if($beneficiary->date_of_birth)
+                                        {{ \Carbon\Carbon::parse($beneficiary->date_of_birth)->format('Y/m/d') }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($beneficiary->family)
+                                        <a href="{{ route('families.show', $beneficiary->family) }}" class="text-decoration-none">
+                                            {{ $beneficiary->family->family_name }}
+                                        </a>
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($beneficiary->contact_info)
+                                        {{ $beneficiary->contact_info }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ $beneficiary->aidRecords->count() }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('beneficiaries.show', $beneficiary) }}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('beneficiaries.edit', $beneficiary) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="alert alert-info">لا توجد مستفيدين مسجلين بعد.</div>
         @endif
     </div>
 </div>

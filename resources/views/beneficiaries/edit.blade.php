@@ -1,48 +1,96 @@
 @extends('layouts.app')
-@section('title', 'Edit Beneficiary')
+
+@section('title', 'تعديل المستفيد')
 @section('content')
-<div class="form-card">
-    <h2 class="form-title">Edit Beneficiary</h2>
-    <form action="{{ route('beneficiaries.update', $beneficiary) }}" method="POST" autocomplete="off">
-        @csrf
-        @method('PUT')
-        <div class="form-group">
-            <label for="name">Name <span class="req">*</span></label>
-            <input type="text" name="name" id="name" value="{{ old('name', $beneficiary->name) }}" required autofocus>
-            @error('name')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="date_of_birth">Date of Birth</label>
-            <input type="date" name="date_of_birth" id="date_of_birth" value="{{ old('date_of_birth', $beneficiary->date_of_birth) }}">
-            @error('date_of_birth')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="contact_info">Contact Info</label>
-            <input type="text" name="contact_info" id="contact_info" value="{{ old('contact_info', $beneficiary->contact_info) }}">
-            @error('contact_info')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="family_id">Family <span class="req">*</span></label>
-            <select name="family_id" id="family_id" required>
-                <option value="">Select Family</option>
-                @foreach($families as $family)
-                    <option value="{{ $family->id }}" @if(old('family_id', $beneficiary->family_id) == $family->id) selected @endif>{{ $family->family_name }}</option>
-                @endforeach
-            </select>
-            @error('family_id')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Update Beneficiary</button>
-            <a href="{{ route('beneficiaries.index') }}" class="btn btn-back">&#8592; Back to Beneficiaries</a>
-        </div>
-    </form>
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">
+            <i class="fas fa-edit me-2"></i>تعديل المستفيد: {{ $beneficiary->name }}
+        </h3>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('beneficiaries.update', $beneficiary) }}" method="POST" autocomplete="off">
+            @csrf
+            @method('PUT')
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">اسم المستفيد <span class="text-danger">*</span></label>
+                        <input type="text" 
+                               class="form-control @error('name') is-invalid @enderror" 
+                               id="name" 
+                               name="name" 
+                               value="{{ old('name', $beneficiary->name) }}" 
+                               required>
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="date_of_birth" class="form-label">تاريخ الميلاد</label>
+                        <input type="date" 
+                               class="form-control @error('date_of_birth') is-invalid @enderror" 
+                               id="date_of_birth" 
+                               name="date_of_birth" 
+                               value="{{ old('date_of_birth', $beneficiary->date_of_birth) }}">
+                        @error('date_of_birth')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="contact_info" class="form-label">معلومات الاتصال</label>
+                        <input type="text" 
+                               class="form-control @error('contact_info') is-invalid @enderror" 
+                               id="contact_info" 
+                               name="contact_info" 
+                               value="{{ old('contact_info', $beneficiary->contact_info) }}" 
+                               placeholder="رقم الهاتف أو البريد الإلكتروني">
+                        @error('contact_info')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="family_id" class="form-label">العائلة <span class="text-danger">*</span></label>
+                        <select class="form-select @error('family_id') is-invalid @enderror" 
+                                id="family_id" 
+                                name="family_id" 
+                                required>
+                            <option value="">اختر العائلة</option>
+                            @foreach($families as $family)
+                                <option value="{{ $family->id }}" 
+                                        {{ old('family_id', $beneficiary->family_id) == $family->id ? 'selected' : '' }}>
+                                    {{ $family->family_name }} - {{ $family->head_of_family }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('family_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ route('beneficiaries.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-1"></i>عودة
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>حفظ التغييرات
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection 

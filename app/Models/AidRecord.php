@@ -13,7 +13,13 @@ class AidRecord extends Model
         'association_id',
         'aid_type',
         'amount',
-        'date_given',
+        'date',
+        'notes',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+        'amount' => 'decimal:2',
     ];
 
     public function beneficiary()

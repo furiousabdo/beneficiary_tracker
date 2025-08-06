@@ -1,44 +1,107 @@
 @extends('layouts.app')
-@section('title', 'Aid Records')
+
+@section('title', 'سجلات المساعدة')
 @section('content')
 <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
-        <h1 style="margin:0;font-size:1.5rem;font-weight:600;">Aid Records</h1>
-        <a href="{{ route('aid_records.create') }}" class="btn btn-primary">+ Add Aid Record</a>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+            <i class="fas fa-hand-holding-heart me-2"></i>سجلات المساعدة
+        </h3>
+        <a href="{{ route('aid-records.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>إضافة سجل مساعدة جديد
+        </a>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Beneficiary</th>
-                <th>Association</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Date Given</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($aidRecords as $aid)
-                <tr>
-                    <td>{{ $aid->id }}</td>
-                    <td>{{ $aid->beneficiary->name ?? 'N/A' }}</td>
-                    <td>{{ $aid->association->name ?? 'N/A' }}</td>
-                    <td>{{ $aid->aid_type }}</td>
-                    <td>${{ number_format($aid->amount, 2) }}</td>
-                    <td>{{ $aid->date_given }}</td>
-                    <td>
-                        <a href="{{ route('aid_records.show', $aid) }}" class="btn btn-light">Show</a>
-                        <a href="{{ route('aid_records.edit', $aid) }}" class="btn btn-secondary">Edit</a>
-                        <form action="{{ route('aid_records.destroy', $aid) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this aid record?')">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="card-body">
+        @if($aidRecords->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>المستفيد</th>
+                            <th>الجمعية</th>
+                            <th>نوع المساعدة</th>
+                            <th>المبلغ</th>
+                            <th>التاريخ</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($aidRecords as $aid)
+                            <tr>
+                                <td>{{ $aid->id }}</td>
+                                <td>
+                                    <strong>{{ $aid->beneficiary->name ?? 'غير محدد' }}</strong>
+                                    @if($aid->beneficiary && $aid->beneficiary->family)
+                                        <br>
+                                        <small class="text-muted">{{ $aid->beneficiary->family->family_name }}</small>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($aid->association)
+                                        {{ $aid->association->name_ar ?? $aid->association->name_en ?? 'غير محدد' }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ $aid->aid_type }}</span>
+                                </td>
+                                <td>
+                                    @if($aid->amount)
+                                        {{ number_format($aid->amount, 2) }} ريال
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($aid->date)
+                                        {{ \Carbon\Carbon::parse($aid->date)->format('Y/m/d') }}
+                                    @else
+                                        <span class="text-muted">غير محدد</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('aid-records.show', $aid) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="عرض">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('aid-records.edit', $aid) }}" 
+                                           class="btn btn-sm btn-outline-secondary" 
+                                           title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('aid-records.destroy', $aid) }}" 
+                                              method="POST" 
+                                              style="display:inline;"
+                                              onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger" 
+                                                    title="حذف">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="text-center py-5">
+                <i class="fas fa-hand-holding-heart fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">لا توجد سجلات مساعدة مسجلة</h5>
+                <p class="text-muted">ابدأ بإضافة سجل مساعدة جديد</p>
+                <a href="{{ route('aid-records.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>إضافة سجل مساعدة جديد
+                </a>
+            </div>
+        @endif
+    </div>
 </div>
 @endsection 

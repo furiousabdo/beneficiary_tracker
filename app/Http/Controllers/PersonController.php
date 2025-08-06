@@ -72,26 +72,34 @@ class PersonController extends Controller
             'address' => 'nullable|string|max:255',
             'father_id' => 'nullable|exists:persons,id',
             'mother_id' => 'nullable|exists:persons,id',
+            'spouse_id' => 'nullable|exists:persons,id',
+            'relationship_to_family_head' => 'required|in:رب الأسرة,زوجة,ابن,ابنة,أب,أم,أخ,أخت,جد,جدة,عم,عمة,خال,خالة,ابن الأخ,ابنة الأخ,ابن الأخت,ابنة الأخت,حفيد,حفيدة,أخرى',
         ]);
 
         $validated['family_id'] = $family->id;
-        $validated['is_family_head'] = false;
+        
+        // Set is_family_head based on the relationship
+        $validated['is_family_head'] = ($validated['relationship_to_family_head'] === 'رب الأسرة');
 
-        Person::create($validated);
+        $person = Person::create($validated);
+        
+        // If the person is not the family head, update their relationship automatically
+        if (!$person->is_family_head) {
+            $person->updateRelationshipToFamilyHead();
+        }
 
         return redirect()->route('families.show', $family)
             ->with('success', 'تمت إضافة الفرد بنجاح');
     }
 
-    public function show(Person $person)
+    public function show(Family $family, Person $person)
     {
-        $person->load(['family.association', 'father', 'mother', 'children']);
-        return view('persons.show', compact('person'));
+        $person->load(['family.association', 'father', 'mother', 'spouse', 'children']);
+        return view('persons.show', compact('person', 'family'));
     }
 
-    public function edit(Person $person)
+    public function edit(Family $family, Person $person)
     {
-        $family = $person->family;
         $familyMembers = $family->persons()
             ->where('id', '!=', $person->id)
             ->pluck('name_ar', 'id');
@@ -99,7 +107,7 @@ class PersonController extends Controller
         return view('persons.edit', compact('person', 'family', 'familyMembers'));
     }
 
-    public function update(Request $request, Person $person)
+    public function update(Request $request, Family $family, Person $person)
     {
         $validated = $request->validate([
             'name_ar' => 'required|string|max:255',
@@ -113,22 +121,31 @@ class PersonController extends Controller
             'address' => 'nullable|string|max:255',
             'father_id' => 'nullable|exists:persons,id',
             'mother_id' => 'nullable|exists:persons,id',
+            'spouse_id' => 'nullable|exists:persons,id',
+            'relationship_to_family_head' => 'required|in:رب الأسرة,زوجة,ابن,ابنة,أب,أم,أخ,أخت,جد,جدة,عم,عمة,خال,خالة,ابن الأخ,ابنة الأخ,ابن الأخت,ابنة الأخت,حفيد,حفيدة,أخرى',
         ]);
 
-        $person->update($validated);
+        // Set is_family_head based on the relationship
+        $validated['is_family_head'] = ($validated['relationship_to_family_head'] === 'رب الأسرة');
 
-        return redirect()->route('families.show', $person->family)
+        $person->update($validated);
+        
+        // If the person is not the family head, update their relationship automatically
+        if (!$person->is_family_head) {
+            $person->updateRelationshipToFamilyHead();
+        }
+
+        return redirect()->route('families.show', $family)
             ->with('success', 'تم تحديث بيانات الفرد بنجاح');
     }
 
-    public function destroy(Person $person)
+    public function destroy(Family $family, Person $person)
     {
         if ($person->is_family_head) {
             return redirect()->back()
                 ->with('error', 'لا يمكن حذف رب الأسرة');
         }
 
-        $family = $person->family;
         $person->delete();
 
         return redirect()->route('families.show', $family)

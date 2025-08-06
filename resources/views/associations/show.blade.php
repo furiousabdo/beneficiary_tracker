@@ -1,109 +1,117 @@
 @extends('layouts.app')
 
-@section('title', 'عرض بيانات الجمعية')
-@section('header', 'عرض بيانات الجمعية')
-
-@section('actions')
-    <a href="{{ route('associations.edit', $association) }}" class="btn btn-warning">
-        <i class="fas fa-edit"></i> تعديل
-    </a>
-    <a href="{{ route('associations.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-right"></i> رجوع
-    </a>
-@endsection
-
+@section('title', 'تفاصيل الجمعية')
 @section('content')
-<div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">البيانات الأساسية</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>الاسم (عربي):</strong> {{ $association->name_ar }}</p>
-                        <p><strong>الاسم (إنجليزي):</strong> {{ $association->name_en ?? '--' }}</p>
-                        <p><strong>العنوان:</strong> {{ $association->address }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>الهاتف:</strong> {{ $association->phone }}</p>
-                        <p><strong>البريد الإلكتروني:</strong> {{ $association->email ?? '--' }}</p>
-                        <p><strong>الموقع الإلكتروني:</strong> 
-                            @if($association->website)
-                                <a href="{{ $association->website }}" target="_blank">{{ $association->website }}</a>
-                            @else
-                                --
-                            @endif
-                        </p>
-                    </div>
-                </div>
-                @if($association->description)
-                    <div class="mt-3">
-                        <h6>الوصف:</h6>
-                        <p>{{ $association->description }}</p>
-                    </div>
-                @endif
-                <div class="mt-3">
-                    <span class="badge bg-{{ $association->is_active ? 'success' : 'danger' }}">
-                        {{ $association->is_active ? 'نشطة' : 'غير نشطة' }}
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">إحصائيات</h5>
-            </div>
-            <div class="card-body">
-                <p><strong>عدد العائلات:</strong> {{ $association->families_count }}</p>
-                <p><strong>تاريخ الإنشاء:</strong> {{ $association->created_at->format('Y-m-d') }}</p>
-                <p><strong>آخر تحديث:</strong> {{ $association->updated_at->format('Y-m-d') }}</p>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">العائلات التابعة</h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+            <i class="fas fa-building me-2"></i>تفاصيل الجمعية
+        </h3>
+        <div class="btn-group" role="group">
+            <a href="{{ route('associations.edit', $association) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-edit me-1"></i>تعديل
+            </a>
+            <a href="{{ route('associations.index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-right me-1"></i>عودة
+            </a>
+        </div>
     </div>
     <div class="card-body">
-        @if($association->families->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>رقم البطاقة</th>
-                            <th>اسم رب الأسرة</th>
-                            <th>تاريخ التسجيل</th>
-                            <th>حالة السكن</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($association->families as $family)
-                            <tr>
-                                <td>{{ $family->family_card_number }}</td>
-                                <td>{{ $family->father->name_ar ?? 'غير محدد' }}</td>
-                                <td>{{ $family->registration_date->format('Y-m-d') }}</td>
-                                <td>{{ $family->housing_status }}</td>
-                                <td>
-                                    <a href="{{ route('families.show', $family) }}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-primary mb-3">المعلومات الأساسية</h5>
+                <table class="table table-borderless">
+                    <tr>
+                        <th class="text-muted" style="width: 150px;">الاسم (عربي):</th>
+                        <td><strong>{{ $association->name_ar ?? 'غير محدد' }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">الاسم (إنجليزي):</th>
+                        <td>{{ $association->name_en ?? 'غير محدد' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">العنوان:</th>
+                        <td>{{ $association->address ?? 'غير محدد' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">الهاتف:</th>
+                        <td>
+                            @if($association->phone)
+                                <i class="fas fa-phone me-1"></i>{{ $association->phone }}
+                            @else
+                                <span class="text-muted">غير محدد</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">البريد الإلكتروني:</th>
+                        <td>
+                            @if($association->email)
+                                <i class="fas fa-envelope me-1"></i>{{ $association->email }}
+                            @else
+                                <span class="text-muted">غير محدد</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">الموقع الإلكتروني:</th>
+                        <td>
+                            @if($association->website)
+                                <a href="{{ $association->website }}" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-globe me-1"></i>{{ $association->website }}
+                                </a>
+                            @else
+                                <span class="text-muted">غير محدد</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">الحالة:</th>
+                        <td>
+                            <span class="badge bg-{{ $association->is_active ? 'success' : 'danger' }}">
+                                {{ $association->is_active ? 'نشطة' : 'غير نشطة' }}
+                            </span>
+                        </td>
+                    </tr>
                 </table>
             </div>
-        @else
-            <div class="alert alert-info">لا توجد عائلات مسجلة لهذه الجمعية.</div>
-        @endif
+            
+            <div class="col-md-6">
+                <h5 class="text-success mb-3">الوصف</h5>
+                @if($association->description)
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="mb-0">{{ $association->description }}</p>
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">لا يوجد وصف للجمعية</p>
+                    </div>
+                @endif
+                
+                <h5 class="text-info mb-3 mt-4">الإحصائيات</h5>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-primary mb-0">{{ $association->families->count() }}</h4>
+                                <small class="text-muted">العائلات</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-success mb-0">{{ $association->aidRecords->count() }}</h4>
+                                <small class="text-muted">سجلات المساعدة</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

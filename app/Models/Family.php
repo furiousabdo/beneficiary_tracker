@@ -85,4 +85,28 @@ class Family extends Model
             $this->buildFamilyTree($child, $tree, $level + 1);
         }
     }
+
+    /**
+     * Update relationships for all family members
+     */
+    public function updateAllRelationships()
+    {
+        $familyMembers = $this->persons;
+        
+        foreach ($familyMembers as $person) {
+            $person->updateRelationshipToFamilyHead();
+        }
+    }
+
+    /**
+     * Get family members grouped by their relationship to family head
+     */
+    public function getMembersByRelationship()
+    {
+        return $this->persons()
+            ->orderBy('relationship_to_family_head')
+            ->orderBy('name_ar')
+            ->get()
+            ->groupBy('relationship_to_family_head');
+    }
 }

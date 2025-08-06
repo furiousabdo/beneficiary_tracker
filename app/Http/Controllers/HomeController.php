@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Association;
 use App\Models\Family;
 use App\Models\Person;
+use App\Models\Beneficiary;
+use App\Models\AidRecord;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -21,16 +23,26 @@ class HomeController extends Controller
             ->take(5)
             ->get();
             
+        $recentBeneficiaries = Beneficiary::with('family')
+            ->latest()
+            ->take(5)
+            ->get();
+            
         $associationsCount = Association::count();
         $familiesCount = Family::count();
         $personsCount = Person::count();
+        $beneficiariesCount = Beneficiary::count();
+        $aidRecordsCount = AidRecord::count();
 
         return view('dashboard', compact(
             'recentFamilies',
             'recentPersons',
+            'recentBeneficiaries',
             'associationsCount',
             'familiesCount',
-            'personsCount'
+            'personsCount',
+            'beneficiariesCount',
+            'aidRecordsCount'
         ));
     }
 
@@ -63,10 +75,17 @@ class HomeController extends Controller
                 ->limit(10)
                 ->get();
                 
+            // Search in beneficiaries
+            $beneficiaries = Beneficiary::where('name', 'like', "%{$query}%")
+                ->with('family')
+                ->limit(10)
+                ->get();
+                
             $results = [
                 'persons' => $persons,
                 'families' => $families,
                 'associations' => $associations,
+                'beneficiaries' => $beneficiaries,
             ];
         }
         

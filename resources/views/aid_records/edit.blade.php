@@ -1,58 +1,139 @@
 @extends('layouts.app')
-@section('title', 'Edit Aid Record')
+
+@section('title', 'تعديل سجل المساعدة')
 @section('content')
-<div class="form-card">
-    <h2 class="form-title">Edit Aid Record</h2>
-    <form action="{{ route('aid_records.update', $aidRecord) }}" method="POST" autocomplete="off">
-        @csrf
-        @method('PUT')
-        <div class="form-group">
-            <label for="beneficiary_id">Beneficiary <span class="req">*</span></label>
-            <select name="beneficiary_id" id="beneficiary_id" required autofocus>
-                @foreach($beneficiaries as $beneficiary)
-                    <option value="{{ $beneficiary->id }}" @if(old('beneficiary_id', $aidRecord->beneficiary_id) == $beneficiary->id) selected @endif>{{ $beneficiary->name }}</option>
-                @endforeach
-            </select>
-            @error('beneficiary_id')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="association_id">Association <span class="req">*</span></label>
-            <select name="association_id" id="association_id" required>
-                @foreach($associations as $association)
-                    <option value="{{ $association->id }}" @if(old('association_id', $aidRecord->association_id) == $association->id) selected @endif>{{ $association->name }}</option>
-                @endforeach
-            </select>
-            @error('association_id')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="aid_type">Aid Type <span class="req">*</span></label>
-            <input type="text" name="aid_type" id="aid_type" value="{{ old('aid_type', $aidRecord->aid_type) }}" required>
-            @error('aid_type')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="amount">Amount <span class="req">*</span></label>
-            <input type="number" name="amount" id="amount" value="{{ old('amount', $aidRecord->amount) }}" step="0.01" required>
-            @error('amount')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="date_given">Date Given <span class="req">*</span></label>
-            <input type="date" name="date_given" id="date_given" value="{{ old('date_given', $aidRecord->date_given) }}" required>
-            @error('date_given')
-                <div class="form-error">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Update Aid Record</button>
-            <a href="{{ route('aid_records.index') }}" class="btn btn-back">&#8592; Back to Aid Records</a>
-        </div>
-    </form>
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">
+            <i class="fas fa-edit me-2"></i>تعديل سجل المساعدة
+        </h3>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('aid-records.update', $aidRecord) }}" method="POST" autocomplete="off">
+            @csrf
+            @method('PUT')
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="beneficiary_id" class="form-label">المستفيد <span class="text-danger">*</span></label>
+                        <select class="form-select @error('beneficiary_id') is-invalid @enderror" 
+                                id="beneficiary_id" 
+                                name="beneficiary_id" 
+                                required>
+                            <option value="">اختر المستفيد</option>
+                            @foreach($beneficiaries as $beneficiary)
+                                <option value="{{ $beneficiary->id }}" 
+                                        {{ old('beneficiary_id', $aidRecord->beneficiary_id) == $beneficiary->id ? 'selected' : '' }}>
+                                    {{ $beneficiary->name }}
+                                    @if($beneficiary->family)
+                                        - {{ $beneficiary->family->family_name }}
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('beneficiary_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="association_id" class="form-label">الجمعية <span class="text-danger">*</span></label>
+                        <select class="form-select @error('association_id') is-invalid @enderror" 
+                                id="association_id" 
+                                name="association_id" 
+                                required>
+                            <option value="">اختر الجمعية</option>
+                            @foreach($associations as $association)
+                                <option value="{{ $association->id }}" 
+                                        {{ old('association_id', $aidRecord->association_id) == $association->id ? 'selected' : '' }}>
+                                    {{ $association->name_ar ?? $association->name_en ?? $association->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('association_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="aid_type" class="form-label">نوع المساعدة <span class="text-danger">*</span></label>
+                        <input type="text" 
+                               class="form-control @error('aid_type') is-invalid @enderror" 
+                               id="aid_type" 
+                               name="aid_type" 
+                               value="{{ old('aid_type', $aidRecord->aid_type) }}" 
+                               required 
+                               placeholder="مثال: طعام، مال، ملابس">
+                        @error('aid_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">المبلغ</label>
+                        <input type="number" 
+                               class="form-control @error('amount') is-invalid @enderror" 
+                               id="amount" 
+                               name="amount" 
+                               value="{{ old('amount', $aidRecord->amount) }}" 
+                               step="0.01" 
+                               placeholder="مثال: 100">
+                        @error('amount')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="date" class="form-label">تاريخ المساعدة <span class="text-danger">*</span></label>
+                        <input type="date" 
+                               class="form-control @error('date') is-invalid @enderror" 
+                               id="date" 
+                               name="date" 
+                               value="{{ old('date', $aidRecord->date ? $aidRecord->date->format('Y-m-d') : '') }}" 
+                               required>
+                        @error('date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">ملاحظات</label>
+                        <textarea class="form-control @error('notes') is-invalid @enderror" 
+                                  id="notes" 
+                                  name="notes" 
+                                  rows="3" 
+                                  placeholder="أي ملاحظات إضافية">{{ old('notes', $aidRecord->notes) }}</textarea>
+                        @error('notes')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ route('aid-records.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right me-1"></i>عودة
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>حفظ التغييرات
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 @endsection 
